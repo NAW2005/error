@@ -7,7 +7,6 @@ const Search = () => {
   const datafromSearchbar = useLocation();
   const items = datafromSearchbar.state;
   const dispatch = useDispatch();
-  // console.log(item);
   return (
     <div className="flex items-center mx-auto flex-wrap gap-3 w-[80%]">
       {items.map((i) => (

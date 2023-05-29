@@ -4,6 +4,7 @@ import Cart from "./Cart";
 import { Link } from "react-router-dom";
 const Addtocart = () => {
   const { cartItems, totalAmount } = useSelector((state) => state.cart);
+  console.log(totalAmount);
 
   if (cartItems.length === 0) {
     return (

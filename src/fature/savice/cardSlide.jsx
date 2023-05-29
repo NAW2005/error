@@ -8,13 +8,16 @@ const initialState = {
 const stroage_KEY = "cartItems";
 const storedItems = Cookies.get(stroage_KEY);
 
+function calculateTotalAmount(cartItems) {
+  return cartItems.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
+}
+
 if (storedItems) {
   initialState.cartItems = JSON.parse(storedItems);
   initialState.totalAmount = calculateTotalAmount(initialState.cartItems);
-}
-
-function calculateTotalAmount(cartItems) {
-  return cartItems.reduce((total, item) => total + item.price, 0);
 }
 
 export const cardSlide = createSlice({
@@ -36,28 +39,37 @@ export const cardSlide = createSlice({
       state.cartItems = state.cartItems.filter((i) => i.id !== payload.id);
       state.quantity--;
       state.totalAmount -= payload.price * payload.quantity;
+
+      state.totalAmount = calculateTotalAmount(state.cartItems);
+      Cookies.set(stroage_KEY, JSON.stringify(state.cartItems));
     },
+
     addItemsQuantity: (state, { payload }) => {
-      state.cartItems = state.cartItems.map((i) => {
+      const data = state.cartItems.map((i) => {
         if (i.id === payload.id) {
           return { ...i, quantity: i.quantity + 1 };
         } else {
           return i;
         }
       });
-      state.totalAmount = calculateTotalAmount(state.cartItems);
+      state.cartItems = data;
+      state.totalAmount = calculateTotalAmount(data);
       Cookies.set(stroage_KEY, JSON.stringify(state.cartItems));
     },
 
     deleteItemsQuantity: (state, { payload }) => {
-      state.cartItems = state.cartItems.map((i) => {
+      const data = state.cartItems.map((i) => {
         if (i.id === payload.id && i.quantity > 1) {
           return { ...i, quantity: i.quantity - 1 };
         } else {
           return i;
         }
       });
-      state.totalAmount -= payload.price;
+      state.cartItems = data;
+      if (payload.quantity !== 1) {
+        state.totalAmount -= payload.price;
+      }
+      Cookies.set(stroage_KEY, JSON.stringify(state.cartItems));
     },
   },
 });
